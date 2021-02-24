@@ -33,7 +33,7 @@ confFile.close()
 
 
 #responce
-print("Conf file created ...")
+print("pythonIF: Conf file created ...")
 
 
 
