@@ -17,20 +17,20 @@ app.use(express.json({limit:'1mb'}));
 app.get('/pytest', (req, res) => {
     // vars
     var recievedData, deploymentData
-    var confSuccess, deploySuccess
+    var confSuccess = false, deploySuccess = false
 
 
 
     //----creation of networkConf file --------------------
 
-    const python = spawn('python', ['pythonInterface.py']); // creates new python child process
+    const runPythonInt = spawn('python', ['pythonInterface.py']); // creates new python child process
 
-     python.stdout.on('data', function (data) { // event trigger for data out buffer of PythonInterface
+     runPythonInt.stdout.on('data', function (data) { // event trigger for data out buffer of PythonInterface
         console.log('Data returned from python interface');
         recievedData = data.toString();
     });
 
-     python.on('close', (code) => { // event trigger for end of child process
+     runPythonInt.on('close', (code) => { // event trigger for end of child process
         if(code == '0') {
           confSuccess = true
           console.log(`NetworkConf File Created, code: ${code}`)
@@ -45,24 +45,23 @@ app.get('/pytest', (req, res) => {
 
 
     //----deploment of networkConf file ---
-    if(confSuccess){
-        const python = spawn('python', ['deployNetwork.py']); // creates new python child process
 
-         python.stdout.on('data', function (data) { // event trigger for data out buffer of deployNetwork
-            console.log('Data returned from python interface');
-            deploymentData = data.toString();
-        });
+    const runNetworkConf = spawn('python', ['deployNetwork.py']); // creates new python child process
 
-         python.on('close', (code) => { // event trigger for end of child process
-            if(code == '0') {
-              console.log(`Network deployed, code: ${code}`)
-            }
-            else {
-                console.log(`Network deployment failed, code: ${code}`);
-            }
-            console.log(recievedData) // use or delete!!
-        });
-    }
+    runNetworkConf.stdout.on('data', function (data) { // event trigger for data out buffer of deployNetwork
+       console.log('Data returned from python interface');
+       deploymentData = data.toString();
+    });
+
+    runNetworkConf.on('close', (code) => { // event trigger for end of child process
+        if(code == '0') {
+            console.log(`Network deployed, code: ${code}`)
+        }
+        else {
+            console.log(`Network deployment failed, code: ${code}`);
+        }
+        console.log(deploymentData) // use or delete!!
+    });
 
 
     //-----status

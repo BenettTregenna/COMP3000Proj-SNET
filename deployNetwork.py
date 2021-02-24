@@ -10,23 +10,22 @@ try:
 except:
     print("error, couldn't connect to Mininet server")
 
-# try:
+try:
+    sftp = client.open_sftp()
+    sftp.put('networkConf.py', '/home/mininet/mininet/config/networkConf.py')
+    print('File uploaded')
 
-sftp = client.open_sftp()
-sftp.put('networkConf.py', '/home/mininet/mininet/config/networkConf.py')
-print('File uploaded')
+    sftp.close()
+    client.close()
 
-# except:
-# print("error,file copy to remote server failed")
+except:
+    print("error,file copy to remote server failed")
 
-# finally:
-sftp.close()
-client.close()
+
+
+# print("pythonDN: network deployed")
+
 
 # stdout = client.exec_command('python ./networkConf.py')[1]
 # for line in stdout:
 #    print(line)
-
-
-# print("pythonDN: network deployed")
-# sys.exit(0)
