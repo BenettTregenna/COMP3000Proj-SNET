@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<!-- Top container -->
+<%- include('../partials/header'); %>
+
+<body class="w3-light-grey">
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+
+    <!-- Header -->
+    <header class="w3-container" style="padding-top:22px">
+        <h5><b><i class="fa fa-dashboard"></i> Network Configuration</b></h5>
+    </header>
+
+    <!--          ///                          page content                                 ///                     -->
+
+    <button class = "btn btn-primary btn-block" type="submit" id = "testButton" >test</button><b></b>
+    <p id = "messageOutput"></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--          ///                          page content                                 ///                     -->
+    <%- include('../partials/footer'); %>
+</div>
+
+
+<script>
+    testNum = 5
+    testBtn = document.getElementById("testButton");
+    testBtn.addEventListener('click', async  event =>{
+        let msgBody = {
+            message : 0,
+        }
+
+        let i
+        for (i = 0; i < testNum; i++) {
+            const msgOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(msgBody)
+            };
+            const msg = await fetch('/testComs', msgOptions);
+
+            let msgStatus = await msg.json();
+            if (msgStatus.status = 'success') {
+                console.log(msgStatus);
+                document.getElementById("messageOutput").innerText = msgStatus.testresult;
+            } else{
+                console.log('validation unsuccessful!')
+            }
+            msgBody.message++
+
+
+        }
+
+
+    })
+
+
+</script>
+
+
+</body>
+</html>
