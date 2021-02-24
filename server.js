@@ -1,5 +1,5 @@
 const express = require('express');
-const { spawn } = require('child_process');
+const {spawn} = require('child_process');
 
 const fetch = require('node-fetch');
 const app = express(); // express setup
@@ -9,11 +9,11 @@ app.set('view engine', 'ejs');
 
 
 //testing python coms
-app.get('/', (req, res) => {
+app.get('/pytest', (req, res) => {
 
-    var dataToSend;
+    var dataToSend, errToSend;
     // spawn new child process to call the python script
-    const python = spawn('python', ['mininet.py']);
+    const python = spawn('python', ['pythonInterface.py']);
     // collect data from script
     python.stdout.on('data', function (data) {
         console.log('Pipe data from python script ...');
@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
     python.on('close', (code) => {
         console.log(`child process close all stdio with code ${code}`);
         // send data to browser
-        console.log(dataToSend);
+        console.log(dataToSend)
     });
 
 })

@@ -1,6 +1,6 @@
-from mininet.topo import SingleSwitchTopo
-from mininet.net import Mininet
-from mininet.cli import CLI
+from pythonInterface.topo import SingleSwitchTopo
+from pythonInterface.net import Mininet
+from pythonInterface.cli import CLI
 
 net = Mininet(SingleSwitchTopo(2))
 net.start()
