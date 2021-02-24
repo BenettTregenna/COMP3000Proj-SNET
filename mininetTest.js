@@ -28,3 +28,9 @@ proc.on('message:listening', function () {
 proc.on('stdout', function (data) {
   process.stdout.write('h1 ' + data)
 })
+
+//net = Mininet(controller=RemoteController, switch=OVSKernelSwitch)
+ //   c1 = net.addController('c1', controller=RemoteController,
+//ip="192.168.1.100", port=6653)
+
+net = Mininet(controller = RemoteController, switch=OVSKernelSwitch)
