@@ -10,9 +10,6 @@ app.listen(3000, () =>console.log('Server Listening at 3000')); // express liste
 app.use(express.static('views'));
 app.use(express.json({limit:'1mb'}));
 
-
-
-
 //testing python coms
 app.get('/pytest', (req, res) => {
     // vars
@@ -71,20 +68,43 @@ app.get('/pytest', (req, res) => {
 
 
 
-
 })
+// //----------------DUMBLY DONE BIT ______ REDO-------------------------------------------------------
+// app.get('/app.js',function(req,res) {
+//     res.sendFile('C:/Users/Ben/PycharmProjects/COMP3000Proj-SNET/app.js');
+// });
+//
+// app.get('/data.js',function(req,res) {
+//     res.sendFile('C:/Users/Ben/PycharmProjects/COMP3000Proj-SNET/data.js');
+// });
+//
+// app.get('/next.css',function(req,res) {
+//     res.sendFile('C:/Users/Ben/PycharmProjects/COMP3000Proj-SNET/node_modules/next-ui/css/next.css');
+// });
+//
+// app.get('/next.js',function(req,res) {
+//     res.sendFile('C:/Users/Ben/PycharmProjects/COMP3000Proj-SNET/node_modules/next-ui/js/next.js');
+// });
 
 
+//---------------------------
 
 
 
 app.get('/index',function(req,res){
     res.render('pages/index');
 });
-
+app.get('', function(req,res){
+    res.render('pages/index');
+});
+app.get('/', function(req,res){
+    res.render('pages/index');
+});
 
 app.get('/network',function(req,res){
-    res.render('pages/network');
+    res.render('pages/network', {
+
+    });
 });
 
 app.post('/testComs', (request, responce) =>{
@@ -95,4 +115,4 @@ app.post('/testComs', (request, responce) =>{
         status: 'success!',
         testresult: data.message
     });
-})
+});
