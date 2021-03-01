@@ -107,12 +107,38 @@ app.get('/network',function(req,res){
     });
 });
 
-app.post('/testComs', (request, responce) =>{
-    console.log('post request recieved: testcoms');
-    console.log(request.body);
+app.post('/changeNetConf', (request, responce) =>{
     const data = request.body;
-    responce.json({
-        status: 'success!',
-        testresult: data.message
-    });
+    console.log('post request recieved "changeNetConf" ; request type: '+ data.request);
+
+    // save changes made
+
+    if(true){ // if changes saved successfully
+        switch (data.request) {
+            case 'addHost':
+                responce.json({
+                    status: '200',
+                    statusDescription: 'Host: "'+ data.hostname +'"'+ ' Added'
+                })
+                break;
+            case 'addSwitch':
+                responce.json({
+                    status: '200',
+                    statusDescription: 'Switch: "'+ data.hostname +'"'+ ' Added'
+                })
+                break;
+            case 'addRouter':
+                responce.json({
+                    status: '200',
+                    statusDescription: 'Router: "'+ data.hostname +'"'+ ' Added'
+                })
+                break;
+        }
+
+    }
+
+
+
 });
+
+

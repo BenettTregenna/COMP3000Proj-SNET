@@ -3,8 +3,8 @@
 
 <head>
     <%- include('../partials/head'); %>
-    <link rel="stylesheet" href="/next.css">
-    <script type="text/javascript" src="next.js"></script>
+    <!--<link rel="stylesheet" href="/next.css">
+    <script type="text/javascript" src="next.js"></script>-->
 </head>
 
 <!-- Top container -->
@@ -12,28 +12,190 @@
 
 <body class="w3-light-grey">
 <!-- !PAGE CONTENT! -->
-<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+<div class="w3-main" style="margin-left:320px;margin-top:70px;">
 
-    <!-- Header -->
-    <header class="w3-container" style="padding-top:22px">
-        <h5><b><i class="fa fa-dashboard"></i> Network Configuration</b></h5>
-    </header>
+    <div class="w3-row">
+    <!-- Left Column -->
+        <div class="w3-col m7">
+          <!-- Profile -->
+          <div class="w3-card w3-round w3-white">
+            <div class="w3-container">
+             <h3 class="w3-center">Network Configurator</h3>
+             <hr>
+             <div class="w3-container w3-center">
+                <p>YOURNETWORKCONFIGNAME.CONF</p> <!-- need to center-->
+             </div>
+            </div>
+          </div>
+          <br>
 
-    <!--          ///                          page content                                 ///                     -->
+          <!-- network visualiser -->
+          <div class="w3-card w3-round">
+              <div class="w3-container w3-center">
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <p> Network visualiser placeholder</p>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+              </div>
+          </div>
+          <br>
 
-    <button class = "btn btn-primary btn-block" type="submit" id = "testButton" >test</button><b></b>
-    <p id = "messageOutput"></p>
-    <br>
-    <br>
-    <div id="topology-container" style="margin-left:300px;margin-top:43px;"></div>
-    <script type="text/javascript" src="data.js"></script>
-	<script type="text/javascript" src="/app.js"></script>
-    <!--          ///                          page content                                 ///                     -->
-    <%- include('../partials/footer'); %>
+          <!-- Interests -->
+          <div class="w3-card w3-round w3-white w3-hide-small">
+            <div class="w3-container">
+              <h5>Network Creation Status</h5>
+              <p id="messageOutput"></p>
+              <br>
+            </div>
+          </div>
+          <br>
+
+        <!-- End Left Column -->
+        </div>
+
+        <!-- Right Column -->
+        <div class="w3-col m4">
+
+          <div class="w3-row-padding">
+            <div class="w3-col m12">
+              <div class="w3-card w3-round w3-white">
+                <div class="w3-container w3-padding">
+                  <h6 class="w3-opacity">Save/ load a Configuration</h6>
+                  <p contenteditable="true" class="w3-border w3-padding">File: My configuration.py</p>
+                  <button type="button" class="w3-button w3-theme"><i class="fas fa-save"></i>  Save</button>
+                  <button type="button" class="w3-button w3-theme"><i class="fas fa-upload"></i>  Load</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="w3-container w3-card w3-white w3-round w3-margin w3-left-align"><br>
+              <button onclick="showHideElement('addHost')" class="w3-button w3-block w3-left-align">Add Host</button>
+              <div id="addHost" class="w3-container w3-hide w3-light-grey">
+                  <h4>
+                      <span style="color:black">Host Configuration</span>
+                      <button onclick= addElement('host') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-plus-square"></i>  Create</button>
+                  </h4>
+                  <p><label>Hostname:</label>
+                  <input class="w3-input w3-border" id="tbxHostHostname" type="text"></p>
+                  <p> ... other attributes</p>
+              </div>
+          </div>
+
+          <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
+              <button onclick="showHideElement('addSwitch')" class="w3-button w3-block w3-left-align">Add Switch</button>
+              <div id="addSwitch" class="w3-container w3-hide w3-light-grey">
+                  <h4>
+                      <span style="color:black">Switch Configuration</span>
+                      <button onclick= addElement('switch') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-plus-square"></i>  Create</button>
+                  </h4>
+                  <p><label>Hostname:</label>
+                  <input class="w3-input w3-border" id="tbxSwitchHostname" type="text"></p>
+                  <p> ... other attributes</p>
+              </div>
+          </div>
+
+          <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
+              <button onclick="showHideElement('addRouter')" class="w3-button w3-block w3-left-align">Add Router</button>
+              <div id="addRouter" class="w3-container w3-hide w3-light-grey">
+                  <h4>
+                      <span style="color:black">Router Configuration</span>
+                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-plus-square"></i>  Create</button>
+                  </h4>
+                  <p><label>Hostname:</label>
+                  <input class="w3-input w3-border" id="tbxRouterHostname" type="text"></p>
+                  <p> ... other attributes</p>
+              </div>
+          </div>
+
+        <!-- End Right Column -->
+        </div>
+
+      <!-- End Grid -->
+      </div>
+        <%- include('../partials/footer'); %>
+    </div>
 </div>
+
+</body>
+
+    <!--<div id="topology-container" style="margin-left:300px;margin-top:43px;"></div>
+    <script type="text/javascript" src="data.js"></script>
+	<script type="text/javascript" src="/app.js"></script>-->
+
+
+
+</html>
+
 
 
 <script>
+
+    async function addElement(elementType, async){
+        let msgBody = {};
+        switch(elementType) {
+            case 'host':
+                msgBody = {
+                    request: 'addHost',
+                    hostname: document.getElementById("tbxHostHostname").value
+                }
+                console.log(msgBody);
+                break;
+            case 'switch':
+                msgBody = {
+                    request: 'addSwitch',
+                    hostname: document.getElementById("tbxSwitchHostname").value
+                }
+                console.log(msgBody);
+                break;
+            case 'router':
+                msgBody = {
+                    request: 'addRouter',
+                    hostname: document.getElementById("tbxRouterHostname").value
+                }
+                console.log(msgBody);
+                break;
+            case 'link':
+                break;
+        }
+        const msgOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(msgBody)
+        };
+        const msg = await fetch('/changeNetConf', msgOptions);
+
+        let msgStatus = await msg.json();
+        if (msgStatus.status = '200') {
+            console.log(msgStatus);
+            document.getElementById("messageOutput").innerText = msgStatus.statusDescription;
+        } else{
+            document.getElementById("messageOutput").innerText = msgStatus.statusDescription + ' please try again!';
+        }
+
+    };
+
+    // accordion code for sidebar
+    function showHideElement(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+          x.className += " w3-show";
+        } else {
+          x.className = x.className.replace(" w3-show", "");
+        }
+    }
+
+
+
+
+    /*
     testNum = 5
     testBtn = document.getElementById("testButton");
     testBtn.addEventListener('click', async  event =>{
@@ -65,11 +227,6 @@
         }
 
 
-    })
-
+    })*/
 
 </script>
-
-
-</body>
-</html>
