@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+
+
 <html>
 
 <head>
@@ -32,20 +34,20 @@
           <!-- network visualiser -->
           <div class="w3-card w3-round">
               <div class="w3-container w3-center">
-                  <br>
-                  <br>
-                  <br>
-                  <br>
-                  <p> Network visualiser placeholder</p>
-                  <br>
-                  <br>
-                  <br>
-                  <br>
+                  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+                  <style type="text/css">
+                      #mynetwork {
+                        width: 525px;
+                        height: 525px;
+                        border: 1px solid #d3d3d3;
+                      }
+                  </style>
+                  <div id="mynetwork"></div>
               </div>
           </div>
           <br>
 
-          <!-- Interests -->
+          <!-- Net creation status -->
           <div class="w3-card w3-round w3-white w3-hide-small">
             <div class="w3-container">
               <h5>Network Creation Status</h5>
@@ -59,7 +61,7 @@
         </div>
 
         <!-- Right Column -->
-        <div class="w3-col m4">
+        <div class="w3-col m5">
 
           <div class="w3-row-padding">
             <div class="w3-col m12">
@@ -67,8 +69,9 @@
                 <div class="w3-container w3-padding">
                   <h6 class="w3-opacity">Save/ load a Configuration</h6>
                   <p contenteditable="true" class="w3-border w3-padding">File: My configuration.py</p>
-                  <button type="button" class="w3-button w3-theme"><i class="fas fa-save"></i>  Save</button>
+                  <button href = "/deploy" type="button" class="w3-button w3-theme"><i class="fas fa-save"></i>  Save</button>
                   <button type="button" class="w3-button w3-theme"><i class="fas fa-upload"></i>  Load</button>
+                  <button type="button" class="w3-button w3-theme"><i class="fas fa-file-export"></i>  Deploy</button>
                 </div>
               </div>
             </div>
@@ -113,6 +116,21 @@
               </div>
           </div>
 
+          <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
+              <button onclick="showHideElement('addLink')" class="w3-button w3-block w3-left-align">Add Link</button>
+              <div id="addLink" class="w3-container w3-hide w3-light-grey">
+                  <h4>
+                      <span style="color:black">Link Configuration</span>
+                      <button onclick= addElement('Link') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-plus-square"></i>  Create</button>
+                  </h4>
+                  <p><label>Source:</label>
+                      <select id="selectSource" ></select>
+                  <br>
+                  <p><label>Destination:</label>
+                      <select id="selectDest" ></select></p>
+              </div>
+          </div>
+
         <!-- End Right Column -->
         </div>
 
@@ -127,14 +145,23 @@
     <!--<div id="topology-container" style="margin-left:300px;margin-top:43px;"></div>
     <script type="text/javascript" src="data.js"></script>
 	<script type="text/javascript" src="/app.js"></script>-->
+<script type="text/javascript">
 
+  // create an array with nodes
+  let visNodes = new vis.DataSet([]);
 
+  // create an array with edges
+  let visEdges = new vis.DataSet([]);
 
-</html>
-
-
-
-<script>
+  // create a network
+  var visContainer = document.getElementById("mynetwork");
+  var visData = {
+    nodes: visNodes,
+    edges: visEdges,
+  };
+  var visOptions = {};
+  var visNetwork = new vis.Network(visContainer, visData, visOptions);
+  var visCounter;
 
     async function addElement(elementType, async){
         let msgBody = {};
@@ -172,10 +199,28 @@
         };
         const msg = await fetch('/changeNetConf', msgOptions);
 
-        let msgStatus = await msg.json();
-        if (msgStatus.status = '200') {
+        let returnMsg = await msg.json();
+        if (returnMsg.status = '200') {
+            switch (elementType){
+                case 'host':
+                    console.log(returnMsg.deviceName);
+                    visNodes.add([{label: returnMsg.deviceName, color: 'grey' , shape: 'square'}]);
+                    break;
+                case 'switch':
+                    console.log(returnMsg.deviceName);
+                    visNodes.add([{label: returnMsg.deviceName, color: 'green' , shape: 'square'}]);
+                    break;
+                case 'router':
+                    console.log(returnMsg.deviceName);
+                    visNodes.add([{label: returnMsg.deviceName, color: 'blue' , shape: 'square'}]);
+                    break;
+                //case 'link':
+                //    visEdges.add([{}])
+                //    break;
+                }
             console.log(msgStatus);
             document.getElementById("messageOutput").innerText = msgStatus.statusDescription;
+            visNetwork.redraw();
         } else{
             document.getElementById("messageOutput").innerText = msgStatus.statusDescription + ' please try again!';
         }
@@ -187,10 +232,33 @@
         var x = document.getElementById(id);
         if (x.className.indexOf("w3-show") == -1) {
           x.className += " w3-show";
+          if(id == 'addLink'){
+              // set up dynamic source and destination dropdowns
+              let selectSource = document.getElementById("selectSource");
+              let selectDest = document.getElementById("selectDest");
+
+
+              while(selectDest.options.length > 0){
+                  selectDest.options.remove(0);
+              }
+              while(selectSource.options.length > 0){
+                  selectSource.options.remove(0);
+              }
+
+              visData.nodes.forEach(function(node){
+                  let selectOption = new Option(node.label);
+
+                  selectSource.appendChild(selectOption);
+                  selectDest.appendChild(selectOption);
+              })
+
+          }
         } else {
           x.className = x.className.replace(" w3-show", "");
         }
     }
+
+
 
 
 
@@ -230,3 +298,9 @@
     })*/
 
 </script>
+
+
+</html>
+
+
+
