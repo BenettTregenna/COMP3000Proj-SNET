@@ -1,28 +1,43 @@
 
 class entity_host {
-    constructor(hostname) {
+    constructor(hostname, id) {
         this.hostname = hostname;
+        this.id = id
         //add additional attributes
+    }
+    getId(){
+        return this.id
     }
 }
 class entity_switch {
-    constructor(hostname) {
+    constructor(hostname, id) {
         this.hostname = hostname;
+        this.id = id
         //add additional attributes
+    }
+    getId(){
+        return this.id
     }
 }
 class entity_router {
-    constructor(hostname) {
+    constructor(hostname, id) {
         this.hostname = hostname;
+        this.id = id
         // add additional attributes
+    }
+    getId(){
+        return this.id
     }
 }
 class entity_link {
-    constructor(source,destination) {
+    constructor(source, sourceId, destination, destinationId) {
         this.source = source;
+        this.sourceId = sourceId
         this.destination = destination;
+        this.destinationId = destinationId;
         // add additional attributes
     }
+
 }
 
 class currentTopology {
@@ -86,7 +101,7 @@ class currentTopology {
         this.links = links;
     }
     // individual
-    addlink(newLink){
+    addLink(newLink){
         this.links.push(newLink);
     }
     removeLink(index){

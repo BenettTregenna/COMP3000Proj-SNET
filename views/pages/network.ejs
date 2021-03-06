@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 
-
 <html>
 
 <head>
@@ -12,7 +11,7 @@
 <!-- Top container -->
 <%- include('../partials/header'); %>
 
-<body class="w3-light-grey">
+<body class="w3-light-grey" onload="populateVisStartup()">
 <!-- !PAGE CONTENT! -->
 <div class="w3-main" style="margin-left:320px;margin-top:70px;">
 
@@ -25,7 +24,7 @@
              <h3 class="w3-center">Network Configurator</h3>
              <hr>
              <div class="w3-container w3-center">
-                <p>YOURNETWORKCONFIGNAME.CONF</p> <!-- need to center-->
+                <p>YOUR-NETWORK-CONFIG-NAME.CONF</p> <!-- need to center-->
              </div>
             </div>
           </div>
@@ -37,9 +36,7 @@
                   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
                   <style type="text/css">
                       #mynetwork {
-                        width: 525px;
-                        height: 525px;
-                        border: 1px solid #d3d3d3;
+                        height: 600px;
                       }
                   </style>
                   <div id="mynetwork"></div>
@@ -78,12 +75,13 @@
           </div>
 
           <div class="w3-container w3-card w3-white w3-round w3-margin w3-left-align"><br>
-              <button onclick="showHideElement('addHost')" class="w3-button w3-block w3-left-align">Add Host</button>
+              <i class="fas fa-desktop "></i>
+              <button onclick="showHideElement('addHost')" class="w3-button w3-block w3-left-align">Add New Host</button>
               <div id="addHost" class="w3-container w3-hide w3-light-grey">
-                  <h4>
-                      <span style="color:black">Host Configuration</span>
+                  <h6>
+                      <span style="color:black">New Host Configuration</span>
                       <button onclick= addElement('host') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-plus-square"></i>  Create</button>
-                  </h4>
+                  </h6>
                   <p><label>Hostname:</label>
                   <input class="w3-input w3-border" id="tbxHostHostname" type="text"></p>
                   <p> ... other attributes</p>
@@ -121,13 +119,59 @@
               <div id="addLink" class="w3-container w3-hide w3-light-grey">
                   <h4>
                       <span style="color:black">Link Configuration</span>
-                      <button onclick= addElement('Link') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-plus-square"></i>  Create</button>
+                      <button onclick= addElement('link') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-plus-square"></i>  Create</button>
                   </h4>
                   <p><label>Source:</label>
                       <select id="selectSource" ></select>
                   <br>
                   <p><label>Destination:</label>
                       <select id="selectDest" ></select></p>
+              </div>
+          </div>
+
+          <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
+              <p>click an item to edit ...</p>
+              <div id="editHost" class="w3-container w3-hide w3-light-grey">
+                  <h4>
+                      <span style="color:black">Edit Host Configuration</span>
+                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
+                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
+                  </h4>
+                  <p><label>Hostname:</label>
+                  <input class="w3-input w3-border" id="tbxEditHostHostname" type="text"></p>
+                  <p> ... other attributes</p>
+              </div>
+              <div id="editSwitch" class="w3-container w3-hide w3-light-grey">
+                  <h4>
+                      <span style="color:black">Edit Switch Configuration</span>
+                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
+                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
+                  </h4>
+                  <p><label>Hostname:</label>
+                  <input class="w3-input w3-border" id="tbxEditSwitchHostname" type="text"></p>
+                  <p> ... other attributes</p>
+              </div>
+              <div id="editRouter" class="w3-container w3-hide w3-light-grey">
+                  <h4>
+                      <span style="color:black">Edit Router Configuration</span>
+                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
+                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
+                  </h4>
+                  <p><label>Hostname:</label>
+                  <input class="w3-input w3-border" id="tbxEditRouterHostname" type="text"></p>
+                  <p> ... other attributes</p>
+              </div>
+              <div id="editLink" class="w3-container w3-hide w3-light-grey">
+                  <h4>
+                      <span style="color:black">Edit Link Configuration</span>
+                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
+                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
+                  </h4>
+                  <p><label>Source:</label>
+                      <select id="editSource" ></select>
+                  <br>
+                  <p><label>Destination:</label>
+                      <select id="editDest" ></select></p>
               </div>
           </div>
 
@@ -145,25 +189,178 @@
     <!--<div id="topology-container" style="margin-left:300px;margin-top:43px;"></div>
     <script type="text/javascript" src="data.js"></script>
 	<script type="text/javascript" src="/app.js"></script>-->
+
 <script type="text/javascript">
 
-  // create an array with nodes
-  let visNodes = new vis.DataSet([]);
+    var visNodes = new vis.DataSet({});
+    var visEdges = new vis.DataSet({});
 
-  // create an array with edges
-  let visEdges = new vis.DataSet([]);
-
-  // create a network
-  var visContainer = document.getElementById("mynetwork");
-  var visData = {
+    // create a network
+    let visContainer = document.getElementById("mynetwork");
+    var visData = {
     nodes: visNodes,
     edges: visEdges,
-  };
-  var visOptions = {};
-  var visNetwork = new vis.Network(visContainer, visData, visOptions);
-  var visCounter;
+    };
+    let visOptions = {interaction: { hover: true }};
+    var visNetwork = new vis.Network(visContainer, visData, visOptions);
 
-    async function addElement(elementType, async){
+    visNetwork.on("click", function(properties) {
+        let selection = visNetwork.getSelection();
+        console.log(selection);
+        if(selection.nodes.length > 0){
+            document.getElementById('messageOutput').innerText = 'clicked nodes:'+ selection.nodes[0];
+            loadEditUi(selection.nodes[0]);
+        }else{
+            document.getElementById('messageOutput').innerText = '';
+
+            document.getElementById('editHost').className = document.getElementById('editHost').className.replace(" w3-show", "");
+            document.getElementById('editSwitch').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
+            document.getElementById('editRouter').className = document.getElementById('editRouter').className.replace(" w3-show", "");
+            document.getElementById('editLink').className = document.getElementById('editLink').className.replace(" w3-show", "");
+
+        }
+        console.log(visNodes);
+        console.log(visData.nodes);
+        console.log(visNetwork.body.nodes);
+    });
+
+    async function populateVisStartup(){
+        const msgOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+        const msg = await fetch('/getNetConf', msgOptions);
+        let runningConf = await msg.json();
+
+        let visNodes = new vis.DataSet(runningConf.runningNodes);
+        let visEdges = new vis.DataSet(runningConf.runningEdges);
+        restartVisNetwork(visNodes,visEdges);
+    };
+
+    function restartVisNetwork(visNodes,visEdges){
+        visNetwork.setData({nodes: visNodes, edges: visEdges});
+        visData.nodes = visNodes;
+        visData.edges = visEdges;
+        // refresh link dropdowns
+        console.log(visNetwork);
+        refreshUI();
+        visNetwork.redraw();
+
+    }
+
+    function refreshUI(){
+
+        let selectSource = document.getElementById("selectSource");
+        let selectDest = document.getElementById("selectDest");
+
+        while(selectDest.options.length > 0){
+          selectDest.options.remove(0);
+        }
+        while(selectSource.options.length > 0){
+          selectSource.options.remove(0);
+        }
+
+        visData.nodes.forEach(function(node){
+          let selectOption = new Option(node.label);
+          selectDest.appendChild(selectOption);
+        })
+
+        visData.nodes.forEach(function(node){
+          let selectOption = new Option(node.label);
+          selectSource.appendChild(selectOption);
+        })
+    }
+
+    async function loadEditUi(itemId){
+        let stringId = itemId.toString();
+        let chosenItem = await getItemDetails(itemId);
+        switch(stringId.charAt(0)){
+            case '1':
+                //setup host div
+                document.getElementById('tbxEditHostHostname').value = chosenItem.hostname;
+                document.getElementById('editHost').className += " w3-show";
+
+                //hide all others
+                document.getElementById('editSwitch').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
+                document.getElementById('editRouter').className = document.getElementById('editRouter').className.replace(" w3-show", "");
+                document.getElementById('editLink').className = document.getElementById('editLink').className.replace(" w3-show", "");
+                break;
+            case '2':
+                //setup switch div
+                document.getElementById('tbxEditSwitchHostname').value = chosenItem.hostname;
+                document.getElementById('editSwitch').className += " w3-show";
+
+                //hide all others
+                document.getElementById('editHost').className = document.getElementById('editHost').className.replace(" w3-show", "");
+                document.getElementById('editRouter').className = document.getElementById('editRouter').className.replace(" w3-show", "");
+                document.getElementById('editLink').className = document.getElementById('editLink').className.replace(" w3-show", "");
+                break;
+            case '3':
+                //setup router div
+                document.getElementById('tbxEditRouterHostname').value = chosenItem.hostname;
+                document.getElementById('editRouter').className += " w3-show";
+
+                //hide all others
+                document.getElementById('editSwitch').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
+                document.getElementById('editHost').className = document.getElementById('editHost').className.replace(" w3-show", "");
+                document.getElementById('editLink').className = document.getElementById('editLink').className.replace(" w3-show", "");
+                break;
+            case '4':
+                //setup link div
+                let editSource = document.getElementById("editSource");
+                let editDest = document.getElementById("editDest");
+
+                while(editDest.options.length > 0){
+                  editDest.options.remove(0);
+                }
+                while(editSource.options.length > 0){
+                  editSource.options.remove(0);
+                }
+
+                visData.nodes.forEach(function(node){
+                  let selectOption = new Option(node.label);
+                  editDest.appendChild(selectOption);
+                })
+
+                visData.nodes.forEach(function(node){
+                  let selectOption = new Option(node.label);
+                  editSource.appendChild(selectOption);
+                })
+
+                document.getElementById('editSource').value = chosenItem.source;
+                document.getElementById('editDest').value = chosenItem.destination;
+                document.getElementById('editLink').className += " w3-show";
+
+                //hide all others
+                document.getElementById('editSwitch').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
+                document.getElementById('editRouter').className = document.getElementById('editRouter').className.replace(" w3-show", "");
+                document.getElementById('editHost').className = document.getElementById('editHost').className.replace(" w3-show", "");
+                break;
+
+        }
+
+    }
+
+    async function getItemDetails(id){
+        let msgBody = {
+            id: id
+        }
+         const msgOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(msgBody)
+        };
+        const msg = await fetch('/getItemInfo', msgOptions);
+
+        let returnMsg = await msg.json();
+        return  returnMsg.itemDetails
+    }
+
+    async function addElement(elementType){
         let msgBody = {};
         switch(elementType) {
             case 'host':
@@ -188,6 +385,13 @@
                 console.log(msgBody);
                 break;
             case 'link':
+
+                 msgBody = {
+                    request: 'addLink',
+                    source: document.getElementById("selectSource").value,
+                    destination: document.getElementById("selectDest").value
+                }
+                console.log(msgBody);
                 break;
         }
         const msgOptions = {
@@ -201,66 +405,35 @@
 
         let returnMsg = await msg.json();
         if (returnMsg.status = '200') {
-            switch (elementType){
-                case 'host':
-                    console.log(returnMsg.deviceName);
-                    visNodes.add([{label: returnMsg.deviceName, color: 'grey' , shape: 'square'}]);
-                    break;
-                case 'switch':
-                    console.log(returnMsg.deviceName);
-                    visNodes.add([{label: returnMsg.deviceName, color: 'green' , shape: 'square'}]);
-                    break;
-                case 'router':
-                    console.log(returnMsg.deviceName);
-                    visNodes.add([{label: returnMsg.deviceName, color: 'blue' , shape: 'square'}]);
-                    break;
-                //case 'link':
-                //    visEdges.add([{}])
-                //    break;
-                }
-            console.log(msgStatus);
-            document.getElementById("messageOutput").innerText = msgStatus.statusDescription;
-            visNetwork.redraw();
+            // code to link server table with vis table
+            let nodeArray = returnMsg.runningNodes;
+            let edgeArray = returnMsg.runningEdges;
+            let visNodes = new vis.DataSet(nodeArray);
+            let visEdges = new vis.DataSet(edgeArray);
+
+            console.log(returnMsg.runningNodes)
+            restartVisNetwork(visNodes, visEdges)
+
+
+            document.getElementById("messageOutput").innerText = returnMsg.statusDescription;
         } else{
-            document.getElementById("messageOutput").innerText = msgStatus.statusDescription + ' please try again!';
+            document.getElementById("messageOutput").innerText = returnMsg.statusDescription + ' please try again!';
         }
 
-    };
+    }
 
     // accordion code for sidebar
     function showHideElement(id) {
         var x = document.getElementById(id);
         if (x.className.indexOf("w3-show") == -1) {
           x.className += " w3-show";
-          if(id == 'addLink'){
-              // set up dynamic source and destination dropdowns
-              let selectSource = document.getElementById("selectSource");
-              let selectDest = document.getElementById("selectDest");
-
-
-              while(selectDest.options.length > 0){
-                  selectDest.options.remove(0);
-              }
-              while(selectSource.options.length > 0){
-                  selectSource.options.remove(0);
-              }
-
-              visData.nodes.forEach(function(node){
-                  let selectOption = new Option(node.label);
-
-                  selectSource.appendChild(selectOption);
-                  selectDest.appendChild(selectOption);
-              })
-
+          if(id == 'addLink') {
+              refreshUI();
           }
         } else {
           x.className = x.className.replace(" w3-show", "");
         }
     }
-
-
-
-
 
 
     /*
@@ -298,7 +471,6 @@
     })*/
 
 </script>
-
 
 </html>
 
