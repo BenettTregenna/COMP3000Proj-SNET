@@ -26,6 +26,7 @@ linkTypes.push( new currentTopo.linkProperties("cat6a", "10Gbps", "500Mhz"));
 app.listen(3000, () =>console.log('Server Listening at 3000')); // express listening for requests on port 3000
 app.use(express.static('views'));
 app.use(express.json({limit:'1mb'}));
+app.use('/resources', express.static('resources'));
 
 
 
@@ -72,18 +73,19 @@ function generateVisTables(type){
         if(type == 'nodes'){
             let nodeArray = [];
             let hosts = currentTopology.getHosts();
+            let dir = '../resources/'
             hosts.forEach(function(item){
-                nodeArray.push({ id: item.id, label: item.hostname, color: 'grey' , shape: 'square'});
+                nodeArray.push({ id: item.id, label: item.hostname, color: 'grey' , image: dir+ 'Host.png', shape: 'image', size: 30 });
             });
             // add switches
             let switches = currentTopology.getSwitches();
             switches.forEach(function(item){
-                nodeArray.push({ id: item.id, label: item.hostname, color: 'green' , shape: 'square'});
+                nodeArray.push({ id: item.id, label: item.hostname, color: 'green' ,image: dir+ 'Switch.png', shape: 'image', size: 30});
             });
             // add routers
             let routers = currentTopology.getRouters();
             routers.forEach(function(item){
-               nodeArray.push({ id: item.id, label: item.hostname, color: 'blue' , shape: 'square'});
+               nodeArray.push({ id: item.id, label: item.hostname, color: 'blue' , image: dir+ 'Router.png', shape: 'image', size: 30});
             });
             console.log('NodeArray(client):');
             console.log(nodeArray);
