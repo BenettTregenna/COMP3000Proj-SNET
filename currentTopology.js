@@ -1,8 +1,8 @@
 
 class entity_host {
-    constructor(hostname, id) {
+    constructor(id, hostname) {
+        this.id = id;
         this.hostname = hostname;
-        this.id = id
         //add additional attributes
     }
     getId(){
@@ -10,9 +10,9 @@ class entity_host {
     }
 }
 class entity_switch {
-    constructor(hostname, id) {
+    constructor(id, hostname) {
+        this.id = id;
         this.hostname = hostname;
-        this.id = id
         //add additional attributes
     }
     getId(){
@@ -20,9 +20,9 @@ class entity_switch {
     }
 }
 class entity_router {
-    constructor(hostname, id) {
+    constructor(id, hostname) {
+        this.id = id;
         this.hostname = hostname;
-        this.id = id
         // add additional attributes
     }
     getId(){
@@ -30,14 +30,22 @@ class entity_router {
     }
 }
 class entity_link {
-    constructor(source, sourceId, destination, destinationId) {
+    constructor(id, linkType, source, sourceId, destination, destinationId) {
+        this.id = id;
+        this.linkType = linkType;
         this.source = source;
         this.sourceId = sourceId
         this.destination = destination;
         this.destinationId = destinationId;
         // add additional attributes
     }
-
+}
+class linkProperties {
+    constructor(cableType, speed, bandwidth) {
+        this.cableType = cableType;
+        this.speed = speed;
+        this.bandwidth = bandwidth;
+    }
 }
 
 class currentTopology {
@@ -59,8 +67,19 @@ class currentTopology {
     addHost(newHost){
         this.hosts.push(newHost);
     }
-    removeHost(index){
-        this.hosts.splice(index,1);
+    editHost(id, newHost){
+        for( let i = 0; i < this.hosts.length; i++){
+            if ( this.hosts[i].id == id ) {
+                this.hosts[i] = newHost
+            }
+        }
+    }
+    removeHost(id){
+        for( let i = 0; i < this.hosts.length; i++){
+            if ( this.hosts[i].id == id ) {
+                this.hosts.splice(i, 1);
+            }
+        }
     }
 
      //                   --  SWITCHES  --
@@ -74,8 +93,19 @@ class currentTopology {
     addSwitch(newSwitch){
         this.switches.push(newSwitch);
     }
-    removeSwitch(index){
-        this.switches.splice(index,1);
+    editSwitch(id, newSwitch){
+        for( let i = 0; i < this.switches.length; i++){
+            if ( this.switches[i].id == id ) {
+                this.switches[i] = newSwitch
+            }
+        }
+    }
+    removeSwitch(id){
+        for( let i = 0; i < this.switches.length; i++){
+            if ( this.switches[i].id == id ) {
+                this.switches.splice(i, 1);
+            }
+        }
     }
 
      //                   --  ROUTERS  --
@@ -89,8 +119,19 @@ class currentTopology {
     addRouter(newRouter){
         this.routers.push(newRouter);
     }
-    removeRouter(index){
-        this.routers.splice(index,1);
+    editRouter(id, newRouter){
+        for( let i = 0; i < this.routers.length; i++){
+            if ( this.routers[i].id == id ) {
+                this.routers[i] = newRouter
+            }
+        }
+    }
+    removeRouter(id){
+        for( let i = 0; i < this.routers.length; i++){
+            if ( this.routers[i].id == id ) {
+                this.routers.splice(i, 1);
+            }
+        }
     }
 
      //                   --  Links  --
@@ -104,17 +145,26 @@ class currentTopology {
     addLink(newLink){
         this.links.push(newLink);
     }
-    removeLink(index){
-        this.links.splice(index,1);
+    editLink(id, newLink){
+        for( let i = 0; i < this.links.length; i++){
+            if ( this.links[i].id == id ) {
+                this.links[i] = newLink
+            }
+        }
     }
-
-
-
+    removeLink(id){
+        for( let i = 0; i < this.links.length; i++){
+            if ( this.links[i].id == id ) {
+                this.links.splice(i, 1);
+            }
+        }
+    }
 }
 
 module.exports = {
     currentTopology: currentTopology,
     entity_link: entity_link,
+    linkProperties: linkProperties,
     entity_router: entity_router,
     entity_switch: entity_switch,
     entity_host: entity_host

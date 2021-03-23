@@ -126,6 +126,11 @@
                   <br>
                   <p><label>Destination:</label>
                       <select id="selectDest" ></select></p>
+                  <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                  <p><label>Cable Type:</label>
+                      <select id="selectCableType" onchange="onCableTypeChanged(this.value,'add')"></select></p>
+                  <p style="font-size:11.0pt">Speed: <span id="cableTypeSpeedBanner" style="font-size:11.0pt"></span></p>
+                  <p style="font-size:11.0pt">Bandwidth: <span id="cableTypeBandwidthBanner" style="font-size:11.0pt"></span></p>
               </div>
           </div>
 
@@ -134,8 +139,9 @@
               <div id="editHost" class="w3-container w3-hide w3-light-grey">
                   <h4>
                       <span style="color:black">Edit Host Configuration</span>
-                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
-                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
+                      <p style="font-size:11.0pt">Host Id: <span id="hostIdBanner" style="font-size:11.0pt"></span></p>
+                      <button onclick= delElement('host') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
+                      <button onclick= editElement('host') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
                   </h4>
                   <p><label>Hostname:</label>
                   <input class="w3-input w3-border" id="tbxEditHostHostname" type="text"></p>
@@ -144,8 +150,9 @@
               <div id="editSwitch" class="w3-container w3-hide w3-light-grey">
                   <h4>
                       <span style="color:black">Edit Switch Configuration</span>
-                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
-                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
+                      <p style="font-size:11.0pt">Switch Id: <span id="switchIdBanner" style="font-size:11.0pt"></span></p>
+                      <button onclick= delElement('switch') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
+                      <button onclick= editElement('switch') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
                   </h4>
                   <p><label>Hostname:</label>
                   <input class="w3-input w3-border" id="tbxEditSwitchHostname" type="text"></p>
@@ -154,8 +161,9 @@
               <div id="editRouter" class="w3-container w3-hide w3-light-grey">
                   <h4>
                       <span style="color:black">Edit Router Configuration</span>
-                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
-                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
+                      <p style="font-size:11.0pt">Router Id: <span id="routerIdBanner" style="font-size:11.0pt"></span></p>
+                      <button onclick= delElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
+                      <button onclick= editElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
                   </h4>
                   <p><label>Hostname:</label>
                   <input class="w3-input w3-border" id="tbxEditRouterHostname" type="text"></p>
@@ -164,14 +172,21 @@
               <div id="editLink" class="w3-container w3-hide w3-light-grey">
                   <h4>
                       <span style="color:black">Edit Link Configuration</span>
-                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
-                      <button onclick= addElement('router') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
+                      <p style="font-size:11.0pt">Link Id: <span id="linkIdBanner" style="font-size:11.0pt"></span></p>
+                      <button onclick= delElement('link') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-minus-square"></i>  Delete</button>
+                      <button onclick= editElement('link') type="button" class="w3-button w3-theme-d2 pull-right"><i class="fas fa-share-square"></i> Save</button>
                   </h4>
                   <p><label>Source:</label>
                       <select id="editSource" ></select>
                   <br>
                   <p><label>Destination:</label>
                       <select id="editDest" ></select></p>
+                  <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                  <p><label>Cable Type:</label>
+                      <select id="editCableType" onchange="onCableTypeChanged(this.value)"></select></p>
+                  <p style="font-size:11.0pt">Speed: <span id="editCableTypeSpeedBanner" style="font-size:11.0pt"></span></p>
+                  <p style="font-size:11.0pt">Bandwidth: <span id="editCableTypeBandwidthBanner" style="font-size:11.0pt"></span></p>
+
               </div>
           </div>
 
@@ -204,20 +219,36 @@
     let visOptions = {interaction: { hover: true }};
     var visNetwork = new vis.Network(visContainer, visData, visOptions);
 
+
+    // setup link types
+    var linkTypes = [];
+    getLinkTypes().then(function(result){
+        linkTypes = result;
+        let selectLinkCableType = document.getElementById("selectCableType");
+        refreshLinkOptsDD(selectLinkCableType, linkTypes);
+
+        let currentType = document.getElementById('selectCableType').value;
+        let linkToShow = getLinkObjectByType(currentType);
+        document.getElementById('cableTypeSpeedBanner').innerText = linkToShow.speed
+        document.getElementById('cableTypeBandwidthBanner').innerText = linkToShow.bandwidth
+    })
+
+    // vis networks
+
     visNetwork.on("click", function(properties) {
         let selection = visNetwork.getSelection();
-        console.log(selection);
         if(selection.nodes.length > 0){
-            document.getElementById('messageOutput').innerText = 'clicked nodes:'+ selection.nodes[0];
+            document.getElementById('messageOutput').innerText = 'Editing node: '+ selection.nodes[0];
             loadEditUi(selection.nodes[0]);
+        }else if(selection.edges.length > 0){
+            document.getElementById('messageOutput').innerText = 'Editing Link: '+ selection.edges[0];
+            loadEditUi(selection.edges[0])
         }else{
             document.getElementById('messageOutput').innerText = '';
-
             document.getElementById('editHost').className = document.getElementById('editHost').className.replace(" w3-show", "");
             document.getElementById('editSwitch').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
             document.getElementById('editRouter').className = document.getElementById('editRouter').className.replace(" w3-show", "");
             document.getElementById('editLink').className = document.getElementById('editLink').className.replace(" w3-show", "");
-
         }
         console.log(visNodes);
         console.log(visData.nodes);
@@ -245,12 +276,14 @@
         visData.edges = visEdges;
         // refresh link dropdowns
         console.log(visNetwork);
-        refreshUI();
+        refreshLinkDD();
         visNetwork.redraw();
 
     }
 
-    function refreshUI(){
+    //ui
+
+    function refreshLinkDD(){
 
         let selectSource = document.getElementById("selectSource");
         let selectDest = document.getElementById("selectDest");
@@ -273,44 +306,70 @@
         })
     }
 
+    function refreshLinkOptsDD(dropdown, linkTypes){
+        while(dropdown.options.length > 0){
+          dropdown.options.remove(0);
+        }
+
+        for (const type of linkTypes) {
+            console.log(type);
+            let selectOption = new Option(type.cableType);
+            dropdown.appendChild(selectOption);
+        }
+    }
+
+    function showHideElement(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+          collapseUI();
+          x.className += " w3-show";
+          if(id == 'addLink') {
+              refreshLinkDD();
+          }
+        } else {
+          x.className = x.className.replace(" w3-show", "");
+        }
+    }
+
+    function collapseUI(){
+        document.getElementById('addHost').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
+        document.getElementById('addSwitch').className = document.getElementById('editRouter').className.replace(" w3-show", "");
+        document.getElementById('addRouter').className = document.getElementById('editLink').className.replace(" w3-show", "");
+        document.getElementById('addLink').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
+        document.getElementById('editHost').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
+        document.getElementById('editSwitch').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
+        document.getElementById('editRouter').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
+        document.getElementById('editLink').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
+    }
+
     async function loadEditUi(itemId){
+        collapseUI()
         let stringId = itemId.toString();
         let chosenItem = await getItemDetails(itemId);
         switch(stringId.charAt(0)){
             case '1':
                 //setup host div
+                document.getElementById('hostIdBanner').innerText = chosenItem.id
                 document.getElementById('tbxEditHostHostname').value = chosenItem.hostname;
                 document.getElementById('editHost').className += " w3-show";
-
-                //hide all others
-                document.getElementById('editSwitch').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
-                document.getElementById('editRouter').className = document.getElementById('editRouter').className.replace(" w3-show", "");
-                document.getElementById('editLink').className = document.getElementById('editLink').className.replace(" w3-show", "");
                 break;
             case '2':
                 //setup switch div
+                document.getElementById('switchIdBanner').innerText = chosenItem.id
                 document.getElementById('tbxEditSwitchHostname').value = chosenItem.hostname;
                 document.getElementById('editSwitch').className += " w3-show";
-
-                //hide all others
-                document.getElementById('editHost').className = document.getElementById('editHost').className.replace(" w3-show", "");
-                document.getElementById('editRouter').className = document.getElementById('editRouter').className.replace(" w3-show", "");
-                document.getElementById('editLink').className = document.getElementById('editLink').className.replace(" w3-show", "");
                 break;
             case '3':
                 //setup router div
+                document.getElementById('routerIdBanner').innerText = chosenItem.id
                 document.getElementById('tbxEditRouterHostname').value = chosenItem.hostname;
                 document.getElementById('editRouter').className += " w3-show";
-
-                //hide all others
-                document.getElementById('editSwitch').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
-                document.getElementById('editHost').className = document.getElementById('editHost').className.replace(" w3-show", "");
-                document.getElementById('editLink').className = document.getElementById('editLink').className.replace(" w3-show", "");
                 break;
             case '4':
                 //setup link div
                 let editSource = document.getElementById("editSource");
                 let editDest = document.getElementById("editDest");
+                let editLinkCableType = document.getElementById("editCableType");
 
                 while(editDest.options.length > 0){
                   editDest.options.remove(0);
@@ -329,19 +388,47 @@
                   editSource.appendChild(selectOption);
                 })
 
+                refreshLinkOptsDD(editLinkCableType, linkTypes)
+
+                console.log('chosen item:');
+                console.log(chosenItem);
+
+                document.getElementById('linkIdBanner').innerText = chosenItem.id
                 document.getElementById('editSource').value = chosenItem.source;
                 document.getElementById('editDest').value = chosenItem.destination;
+                document.getElementById('editCableType').value = chosenItem.linkType.cableType;
+                onCableTypeChanged(chosenItem.linkType.cableType,'');
                 document.getElementById('editLink').className += " w3-show";
-
-                //hide all others
-                document.getElementById('editSwitch').className = document.getElementById('editSwitch').className.replace(" w3-show", "");
-                document.getElementById('editRouter').className = document.getElementById('editRouter').className.replace(" w3-show", "");
-                document.getElementById('editHost').className = document.getElementById('editHost').className.replace(" w3-show", "");
                 break;
 
         }
 
     }
+
+    function onCableTypeChanged(typeName, calledFrom){
+        let linkType = getLinkObjectByType(typeName)
+        if(calledFrom == 'add'){
+            document.getElementById('cableTypeSpeedBanner').innerText = linkType.speed
+            document.getElementById('cableTypeBandwidthBanner').innerText = linkType.bandwidth
+        }else {
+            document.getElementById('editCableTypeSpeedBanner').innerText = linkType.speed
+            document.getElementById('editCableTypeBandwidthBanner').innerText = linkType.bandwidth
+        }
+
+    }
+
+    function getLinkObjectByType(chosenType){
+        let foundType;
+        linkTypes.forEach(function(type){
+            if (chosenType === type.cableType){
+                foundType = type
+            }
+        })
+        return foundType
+    }
+
+
+    // server requests
 
     async function getItemDetails(id){
         let msgBody = {
@@ -358,6 +445,12 @@
 
         let returnMsg = await msg.json();
         return  returnMsg.itemDetails
+    }
+
+    async function getLinkTypes(){
+        const msg = await fetch('/getLinkTypes');
+        let returnMsg = await msg.json();
+        return  returnMsg.linkTypes
     }
 
     async function addElement(elementType){
@@ -385,9 +478,9 @@
                 console.log(msgBody);
                 break;
             case 'link':
-
                  msgBody = {
                     request: 'addLink',
+                    linkType: getLinkObjectByType(document.getElementById('selectCableType').value),
                     source: document.getElementById("selectSource").value,
                     destination: document.getElementById("selectDest").value
                 }
@@ -422,16 +515,128 @@
 
     }
 
-    // accordion code for sidebar
-    function showHideElement(id) {
-        var x = document.getElementById(id);
-        if (x.className.indexOf("w3-show") == -1) {
-          x.className += " w3-show";
-          if(id == 'addLink') {
-              refreshUI();
-          }
+    async function delElement(elementType){
+        let msgBody = {};
+        switch(elementType) {
+            case 'host':
+                msgBody = {
+                    request: 'delHost',
+                    hostname: document.getElementById("tbxEditHostHostname").value
+                }
+                console.log(msgBody);
+                break;
+            case 'switch':
+                msgBody = {
+                    request: 'delSwitch',
+                    hostname: document.getElementById("tbxEditSwitchHostname").value
+                }
+                console.log(msgBody);
+                break;
+            case 'router':
+                msgBody = {
+                    request: 'delRouter',
+                    hostname: document.getElementById("tbxEditRouterHostname").value
+                }
+                console.log(msgBody);
+                break;
+            case 'link':
+                 msgBody = {
+                    request: 'delLink',
+                    source: document.getElementById("editSource").value,
+                    destination: document.getElementById("editDest").value
+                }
+                console.log(msgBody);
+                break;
+        }
+        const msgOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(msgBody)
+        };
+        const msg = await fetch('/changeNetConf', msgOptions);
+
+        let returnMsg = await msg.json();
+        if (returnMsg.status = '200') {
+            // code to link server table with vis table
+            let nodeArray = returnMsg.runningNodes;
+            let edgeArray = returnMsg.runningEdges;
+            let visNodes = new vis.DataSet(nodeArray);
+            let visEdges = new vis.DataSet(edgeArray);
+
+            console.log(returnMsg.runningNodes)
+            restartVisNetwork(visNodes, visEdges)
+
+
+            document.getElementById("messageOutput").innerText = returnMsg.statusDescription;
+        } else{
+            document.getElementById("messageOutput").innerText = returnMsg.statusDescription + ' please try again!';
+        }
+
+    }
+
+    async function editElement(elementType) {
+        let msgBody = {};
+        switch (elementType) {
+            case 'host':
+                msgBody = {
+                    request: 'editHost',
+                    id: document.getElementById("hostIdBanner").innerText,
+                    hostname: document.getElementById("tbxEditHostHostname").value
+                }
+                console.log(msgBody);
+                break;
+            case 'switch':
+                msgBody = {
+                    request: 'editSwitch',
+                    id: document.getElementById("switchIdBanner").innerText,
+                    hostname: document.getElementById("tbxEditSwitchHostname").value
+                }
+                console.log(msgBody);
+                break;
+            case 'router':
+                msgBody = {
+                    request: 'editRouter',
+                    id: document.getElementById("routerIdBanner").innerText,
+                    hostname: document.getElementById("tbxEditRouterHostname").value
+                }
+                console.log(msgBody);
+                break;
+            case 'link':
+                msgBody = {
+                    request: 'editLink',
+                    id: document.getElementById("linkIdBanner").innerText,
+                    linkType: getLinkObjectByType(document.getElementById('editCableType').value),
+                    source: document.getElementById("editSource").value,
+                    destination: document.getElementById("editDest").value
+                }
+                console.log(msgBody);
+                break;
+        }
+        const msgOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(msgBody)
+        };
+        const msg = await fetch('/changeNetConf', msgOptions);
+
+        let returnMsg = await msg.json();
+        if (returnMsg.status = '200') {
+            // code to link server table with vis table
+            let nodeArray = returnMsg.runningNodes;
+            let edgeArray = returnMsg.runningEdges;
+            let visNodes = new vis.DataSet(nodeArray);
+            let visEdges = new vis.DataSet(edgeArray);
+
+            console.log(returnMsg.runningNodes)
+            restartVisNetwork(visNodes, visEdges)
+
+            document.getElementById("messageOutput").innerText = returnMsg.statusDescription;
         } else {
-          x.className = x.className.replace(" w3-show", "");
+            document.getElementById("messageOutput").innerText = returnMsg.statusDescription + ' please try again!';
         }
     }
 
