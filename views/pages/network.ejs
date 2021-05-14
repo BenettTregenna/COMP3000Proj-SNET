@@ -2,14 +2,20 @@
 
 <html>
 
+<!-- include handlebars -->
+<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+
 <head>
     <%- include('../partials/head'); %>
+    <%- include('../partials/ModalCss'); %>
     <!--<link rel="stylesheet" href="/next.css">
     <script type="text/javascript" src="next.js"></script>-->
 </head>
 
 <!-- Top container -->
 <%- include('../partials/header'); %>
+
+
 
 <body class="w3-light-grey" onload="populateVisStartup()">
 <!-- !PAGE CONTENT! -->
@@ -24,7 +30,8 @@
              <h3 class="w3-center">Network Configurator</h3>
              <hr>
              <div class="w3-container w3-center">
-                <p>YOUR-NETWORK-CONFIG-NAME.CONF</p> <!-- need to center-->
+                 <p id="saveStatus"></p>
+                 <h5 id="mainFileNameDisplay"></h5>
              </div>
             </div>
           </div>
@@ -59,21 +66,28 @@
 
         <!-- Right Column -->
         <div class="w3-col m5">
-
+            <!-- Save load box -->
           <div class="w3-row-padding">
             <div class="w3-col m12">
               <div class="w3-card w3-round w3-white">
                 <div class="w3-container w3-padding">
                   <h6 class="w3-opacity">Save/ load a Configuration</h6>
-                  <p contenteditable="true" class="w3-border w3-padding">File: My configuration.py</p>
-                  <button href = "/deploy" type="button" class="w3-button w3-theme"><i class="fas fa-save"></i>  Save</button>
-                  <button type="button" class="w3-button w3-theme"><i class="fas fa-upload"></i>  Load</button>
-                  <button type="button" class="w3-button w3-theme"><i class="fas fa-file-export"></i>  Deploy</button>
+                  <p id="tbxCurrentFileName" class="w3-border w3-padding"></p>
+                  <p id="saveStatusReadout"></p>
+                  <button onclick="saveNetworkToDB(document.getElementById('mainFileNameDisplay').innerText, 'Existing')" type="button" class="w3-button w3-theme"><i class="fas fa-save"></i>  Save</button>
+                  <button onclick="document.getElementById('modSaveNewNetwork').style.display='block'" type="button" class="w3-button w3-theme"><i class="fas fa-file-export"></i>  Save As</button>
+<!--                    // save as Modal -->
+                  <%- include('../partials/SaveModalPopup'); %>
+                  <button onclick="document.getElementById('modLoadNetwork').style.display='block'; fillFileNameSelect()" type="button" class="w3-button w3-theme"><i class="fas fa-upload"></i>  Load</button>
+<!--                     // load modal -->
+                  <%- include('../partials/LoadModal'); %>
+
+
                 </div>
               </div>
             </div>
           </div>
-
+            <!-- Host box -->
           <div class="w3-container w3-card w3-white w3-round w3-margin w3-left-align"><br>
               <i class="fas fa-desktop "></i>
               <button onclick="showHideElement('addHost')" class="w3-button w3-block w3-left-align">Add New Host</button>
@@ -87,7 +101,7 @@
                   <p> ... other attributes</p>
               </div>
           </div>
-
+            <!-- Switch box -->
           <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
               <button onclick="showHideElement('addSwitch')" class="w3-button w3-block w3-left-align">Add Switch</button>
               <div id="addSwitch" class="w3-container w3-hide w3-light-grey">
@@ -100,7 +114,7 @@
                   <p> ... other attributes</p>
               </div>
           </div>
-
+            <!-- Router box -->
           <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
               <button onclick="showHideElement('addRouter')" class="w3-button w3-block w3-left-align">Add Router</button>
               <div id="addRouter" class="w3-container w3-hide w3-light-grey">
@@ -113,7 +127,7 @@
                   <p> ... other attributes</p>
               </div>
           </div>
-
+            <!-- Link box -->
           <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
               <button onclick="showHideElement('addLink')" class="w3-button w3-block w3-left-align">Add Link</button>
               <div id="addLink" class="w3-container w3-hide w3-light-grey">
@@ -133,7 +147,7 @@
                   <p style="font-size:11.0pt">Bandwidth: <span id="cableTypeBandwidthBanner" style="font-size:11.0pt"></span></p>
               </div>
           </div>
-
+            <!-- Edit box -->
           <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
               <p>click an item to edit ...</p>
               <div id="editHost" class="w3-container w3-hide w3-light-grey">
@@ -229,9 +243,15 @@
 
         let currentType = document.getElementById('selectCableType').value;
         let linkToShow = getLinkObjectByType(currentType);
-        document.getElementById('cableTypeSpeedBanner').innerText = linkToShow.speed
-        document.getElementById('cableTypeBandwidthBanner').innerText = linkToShow.bandwidth
+        document.getElementById('cableTypeSpeedBanner').innerText = linkToShow.speed;
+        document.getElementById('cableTypeBandwidthBanner').innerText = linkToShow.bandwidth;
     })
+
+    getFileName().then(function(result){
+        setFileNameUI(result)
+    })
+
+
 
     // vis networks
 
@@ -282,6 +302,16 @@
     }
 
     //ui
+
+    function setFileNameUI(fileName){
+        if (fileName == null){
+             document.getElementById('tbxCurrentFileName').innerText = "-- New_Network --"
+             document.getElementById('mainFileNameDisplay').innerText = "New Network"
+        }else {
+            document.getElementById('tbxCurrentFileName').innerText = ("file: "+ fileName)
+            document.getElementById('mainFileNameDisplay').innerText = fileName
+        }
+    }
 
     function refreshLinkDD(){
 
@@ -427,6 +457,26 @@
         return foundType
     }
 
+    async function fileUnsavedUI(){
+        let currentFileName = await getFileName()
+        document.getElementById('tbxCurrentFileName').innerText = 'file:' + currentFileName + '*'
+    }
+
+    async function fillFileNameSelect(){
+        let fileNameArray = []
+        fileNameArray = await getDBInfo();
+
+        let fileNameDD = document.getElementById("fileNameDD");
+
+        while(fileNameDD.options.length > 0) { // blanking the select
+            fileNameDD.options.remove(0);
+        }
+
+        fileNameArray.forEach(function(name){
+          let selectOption = new Option(name);
+          fileNameDD.appendChild(selectOption);
+        })
+    }
 
     // server requests
 
@@ -442,7 +492,6 @@
                 body: JSON.stringify(msgBody)
         };
         const msg = await fetch('/getItemInfo', msgOptions);
-
         let returnMsg = await msg.json();
         return  returnMsg.itemDetails
     }
@@ -506,6 +555,7 @@
 
             console.log(returnMsg.runningNodes)
             restartVisNetwork(visNodes, visEdges)
+            fileUnsavedUI()
 
 
             document.getElementById("messageOutput").innerText = returnMsg.statusDescription;
@@ -567,6 +617,7 @@
 
             console.log(returnMsg.runningNodes)
             restartVisNetwork(visNodes, visEdges)
+            fileUnsavedUI()
 
 
             document.getElementById("messageOutput").innerText = returnMsg.statusDescription;
@@ -633,6 +684,7 @@
 
             console.log(returnMsg.runningNodes)
             restartVisNetwork(visNodes, visEdges)
+            fileUnsavedUI()
 
             document.getElementById("messageOutput").innerText = returnMsg.statusDescription;
         } else {
@@ -640,6 +692,87 @@
         }
     }
 
+    async function getFileName(){
+        const msg = await fetch('/getFileName');
+        let returnMsg = await msg.json();
+        return  returnMsg.fileName
+    }
+
+    // database
+
+    async function saveNetworkToDB(fileName, type){
+
+        console.log('saveNewNetwork called, FileName: '+ fileName + ', Type: '+ type);
+
+        let msgBody = {
+            fileName: fileName
+        }
+        const msgOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(msgBody)
+        };
+        if( type == "New"){
+            const msg = await fetch('/mySqlSaveNewNetwork', msgOptions);
+            let returnMsg = await msg.json();
+
+            if (returnMsg.status == 200){
+                document.getElementById('saveStatusReadout').innerText = returnMsg.statusDescription;
+                setFileNameUI(fileName);
+                document.getElementById('modSaveNewNetwork').style.display='none'
+            } else {
+                document.getElementById('saveStatusReadout').innerText = returnMsg.statusDescription;
+            }
+        } else {
+            const msg = await fetch('/mySqlEditNetwork', msgOptions);
+            let returnMsg = await msg.json();
+
+            if (returnMsg.status == 200){
+                document.getElementById('saveStatusReadout').innerText = returnMsg.statusDescription;
+                setFileNameUI(fileName);
+            } else {
+                document.getElementById('saveStatusReadout').innerText = returnMsg.statusDescription;
+            }
+        }
+    }
+
+    async function LoadNetworkFromDB(fileName){
+        console.log('saveNewNetwork called, fileName: '+ fileName);
+
+        let msgBody = {
+            fileName: fileName
+        }
+        const msgOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(msgBody)
+        };
+
+        const msg = await fetch('/mySqlLoadNetwork', msgOptions);
+        let returnMsg = await msg.json();
+
+        if (returnMsg.status == 200){
+            populateVisStartup();
+            document.getElementById('saveStatusReadout').innerText = returnMsg.statusDescription;
+            setFileNameUI(fileName);
+            document.getElementById('modLoadNetwork').style.display='none';
+        } else {
+            console.log('network Load Failed');
+        }
+
+
+
+    }
+
+    async function getDBInfo(){
+        const msg = await fetch('/getDBContents');
+        let returnMsg = await msg.json();
+        return returnMsg.result
+    }
 
     /*
     testNum = 5

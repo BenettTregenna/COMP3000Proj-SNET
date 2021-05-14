@@ -1,0 +1,19 @@
+<div id="modSaveNewNetwork" class="modal">
+  <span onclick="document.getElementById('modSaveNewNetwork').style.display='none'" class="close" title="Close Modal">times;</span>//
+  <div class="modal-content">
+    <div class="container">
+      <h1>Save New Network</h1>
+      <p>Please enter a filename and hit save to save a new network.</p>
+      <hr>
+      <label for="tbxModalFileName"><b>File Name</b></label>
+      <input type="text" placeholder="Enter File Name" id="tbxModalFileName" required>
+
+      <p id="paraDescriptionBox">Your files are saved in our secure central database linked to your account</a>.</p>
+
+      <div class="clearfix">
+        <button type="button" onclick="document.getElementById('modSaveNewNetwork').style.display='none'" class="cancelbtn">Cancel</button>
+        <button id="btnModalSave" onclick="saveNetworkToDB(document.getElementById('tbxModalFileName').value, 'New')" class="w3-green">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

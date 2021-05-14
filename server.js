@@ -1,6 +1,7 @@
 const express = require('express');
 const {spawn} = require('child_process');
 const {DataSet} = require("vis-data");
+const mysql = require('mysql');
 
 
 
@@ -17,16 +18,42 @@ const entity_router = currentTopo.entity_router;
 const entity_link = currentTopo.entity_link;
 
 const linkTypes = [];
-linkTypes.push( new currentTopo.linkProperties("cat5", "100Mbps", "100Mhz"));
-linkTypes.push( new currentTopo.linkProperties("cat5e", "1Gbps", "100Mhz"));
-linkTypes.push( new currentTopo.linkProperties("cat6", "1Gbps", "250Mhz"));
-linkTypes.push( new currentTopo.linkProperties("cat6a", "10Gbps", "500Mhz"));
+linkTypes.push( new currentTopo.linkProperties("Cat 5", "100Mbps", "100Mhz"));
+linkTypes.push( new currentTopo.linkProperties("Cat 5e", "1Gbps", "100Mhz"));
+linkTypes.push( new currentTopo.linkProperties("Cat 6", "1Gbps", "250Mhz"));
+linkTypes.push( new currentTopo.linkProperties("Cat 6a", "10Gbps", "500Mhz"));
 
 
 app.listen(3000, () =>console.log('Server Listening at 3000')); // express listening for requests on port 3000
 app.use(express.static('views'));
 app.use(express.json({limit:'1mb'}));
 app.use('/resources', express.static('resources'));
+app.use(express.urlencoded({extended: true}));
+
+
+// database connection
+const connection = mysql.createConnection({
+    host: '192.168.0.149',
+    port: '3306',
+    user: 'TestUser',
+    password: 'Test123',
+    database: 'proj3000'
+});
+
+connection.connect(function(err) {
+    if (err) {
+        console.error('problem connecting to the MYSQL server, ' + err.stack);
+        return;
+    }
+
+    console.log('connected successfully to MySQL server "proj3000"! as id '+ connection.threadId)
+});
+
+connection.query('SELECT * FROM network', function(error, results, fields){
+    if (error) throw error;
+    console.log('Stored Networks');
+    console.log(results);
+});
 
 
 
@@ -306,12 +333,51 @@ app.get('/getNetConf',function(req,res){
 });
 
 app.get('/getLinkTypes',function(req,res){
-    console.log('request recieved getLinkTypes');
+    console.log('request received getLinkTypes');
     res.json({
                 status: '200',
                 linkTypes: linkTypes
     })
 });
+
+app.get('/getFileName',function(req,res){
+    console.log('request received getFileName');
+    res.json({
+                status: '200',
+                fileName: currentTopology.getFileName()
+    })
+});
+
+app.get('/getDBContents', (req, res) => {
+    console.log('get request received "getDBContents"');
+
+    connection.query('SELECT fileName FROM network', function (error, results, fields) {
+
+        if (error) {
+            console.log("error:", error);
+            // Failed responce
+            res.json({
+                status: 400,
+                statusDescription: "Error: " + error
+            })
+        } else {
+            console.log("DB contents received!");
+
+            // success response
+            let fileNameArray = [];
+            results.forEach(function(obj){
+                fileNameArray.push(obj.fileName)
+            });
+
+            res.json({
+                status: 200,
+                statusDescription: "DB contents received!",
+                result: fileNameArray
+            })
+        }
+    });
+});
+
 
 // ----------------  POST   -----------
 
@@ -397,6 +463,115 @@ app.post('/changeNetConf', (request, response) =>{
                 runningEdges: generateVisTables('edges')
     })
 });
+
+app.post('/mySqlSaveNewNetwork', (request, response) =>{
+
+    const fileData = request.body;
+    console.log('post request received "mySqlSaveNewNetwork" ; file name: '+ fileData.fileName);
+
+    let packagedNetwork = JSON.stringify(currentTopology);
+
+    console.log(packagedNetwork);
+    console.log('saving new network .....')
+
+    connection.query('CALL insertnetwork(?,?)', [fileData.fileName, packagedNetwork], function(error, results, fields) {
+        if (error) {
+                console.log("error:", error);
+                // Failed responce
+                response.json({
+                    status: 400,
+                    statusDescription: "Error: " + error
+                })
+        } else {
+                console.log("network " + "'" + fileData.fileName + "'" + " saved!")
+                console.log("affected Rows", results.affectedRows);
+
+                // success response
+                currentTopology.setFileName(fileData.fileName);
+
+                response.json({
+                    status: 200,
+                    statusDescription: "File saved successfully!"
+                })
+            }
+        });
+});
+
+app.post('/mySqlEditNetwork', (request, response) => {
+
+    const fileData = request.body;
+    console.log('post request received "mySqlEditNetwork" ; file name: ' + fileData.fileName);
+
+    let packagedNetwork = JSON.stringify(currentTopology);
+    console.log('saving ' + fileData.fileName + ' .....')
+
+    connection.query('UPDATE network SET networkData = ? WHERE fileName = ?', [packagedNetwork, fileData.fileName], function (error, results, fields) {
+
+        if (error) {
+            console.log("error:", error);
+            // Failed responce
+            response.json({
+                status: 400,
+                statusDescription: "Error: " + error
+            })
+        } else {
+            console.log("network " + "'" + fileData.fileName + "'" + " saved!")
+            console.log("affected Rows", results.affectedRows);
+
+            // success response
+
+            response.json({
+                status: 200,
+                statusDescription: "Changes saved!"
+            })
+        }
+    });
+});
+
+app.post('/mySqlLoadNetwork', (request, response) => {
+
+    const fileData = request.body;
+    console.log('post request received "mySqlLoadNetwork" ; file name: ' + fileData.fileName);
+
+
+    connection.query('SELECT fileName, networkData FROM network WHERE fileName = ?',fileData.fileName, function (error, results, fields) {
+
+        if (error) {
+            console.log("error:", error);
+            // Failed responce
+            response.json({
+                status: 400,
+                statusDescription: "Error: " + error
+            })
+        } else {
+            console.log("DB contents received!");
+
+            // success response
+            let loadedNetwork = JSON.parse(results[0].networkData);
+
+            let newNetwork = new currentTopo.currentTopology();
+
+            newNetwork.setFileName(loadedNetwork.filename);
+            newNetwork.setHosts(loadedNetwork.hosts);
+            newNetwork.setSwitches(loadedNetwork.switches);
+            newNetwork.setRouters(loadedNetwork.routers);
+            newNetwork.setLinks(loadedNetwork.links);
+
+            // overrides current top with loaded top
+            currentTopology = newNetwork;
+
+            console.log(currentTopology);
+
+            response.json({
+                status: 200,
+                statusDescription: "Current Topology Changed!"
+            })
+        }
+    });
+});
+
+
+
 
 app.get('/deploy', (req, res) => {
     // vars

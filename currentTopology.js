@@ -50,11 +50,20 @@ class linkProperties {
 
 class currentTopology {
     constructor() {
+        this.fileName = 'New_Network'
         this.hosts = [];
         this.switches = [];
         this.routers = [];
         this.links = [];
     };
+    //                   -- fileName --
+    getFileName(){
+        return this.fileName;
+    }
+    setFileName(fileName){
+        this.fileName = fileName;
+    }
+
 
     //                   --  HOSTS  --
     getHosts(){

@@ -1,0 +1,26 @@
+<div id="modLoadNetwork" class="modal">
+  <span onclick="document.getElementById('modLoadNetwork').style.display='none'" class="close" title="Close Modal">times;</span>//
+  <div class="modal-content">
+    <div class="container">
+      <h1>Open existing Network</h1>
+      <p>Please choose a file and hit open.</p>
+      <hr>
+      <label><b>File Name</b></label>
+       <div>
+          <select multiple class="selectWide" id="fileNameDD" required size="5">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+          </select>
+       </div>
+
+      <p id="paraDescriptionBox">Your files are saved in our secure central database linked to your account</a>.</p>
+
+      <div class="clearfix">
+        <button type="button" onclick="document.getElementById('modLoadNetwork').style.display='none'" class="cancelbtn">Cancel</button>
+        <button id="btnModalSave" onclick="LoadNetworkFromDB(document.getElementById('fileNameDD').value)" class="w3-green">Open</button>
+      </div>
+    </div>
+  </div>
+</div>
